@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miro Timer</title>
+    <script src="https://developers.miro.com/sdk/1.3/miro.js"></script>
+</head>
+<body>
+    <script>
+     miro.onReady(async () => {
+  const timerText = await miro.board.widgets.create({ type: 'text', text: '00:00:00', x: 100, y: 100 });
+  const startButton = await miro.board.widgets.create({ type: 'shape', text: 'Start', x: 100, y: 150 });
+  const stopButton = await miro.board.widgets.create({ type: 'shape', text: 'Stop', x: 200, y: 150 });
+
+  let startTime;
+  let interval;
+
+  function startTimer() {
+    startTime = Date.now();
+    interval = setInterval(updateTimer, 1000);
+  }
+
+  function updateTimer() {
+    const currentTime = Date.now();
+    const elapsedTime = currentTime - startTime;
+
+    const hours = Math.floor((elapsedTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
+
+    const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    miro.board.widgets.update({ id: timerText.id, text: timeString });
+  }
+
+  function stopTimer() {
+    clearInterval(interval);
+  }
+
+  miro.addListener('widgetClicked', async (event) => {
+    if (event.data.widgetId === startButton.id) {
+      startTimer();
+    } else if (event.data.widgetId === stopButton.id) {
+      stopTimer();
+    }
+  });
+});
+
+    </script>
+</body>
+</html>
